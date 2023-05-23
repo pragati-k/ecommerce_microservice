@@ -1,0 +1,14 @@
+server:
+ port: 9000
+  
+spring:
+ application:
+  name: admin-service
+  
+eureka:
+ instance:
+  hostname: localhost
+  
+logging:
+  file: 
+    path: D:/my-projects/ecommerce_microservice/logs/

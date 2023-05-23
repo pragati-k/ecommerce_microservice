@@ -1,0 +1,14 @@
+server:
+ port: 9001
+ 
+spring:
+ application:
+  name: product-service
+  
+eureka:
+ instance:
+  hostname: localhost
+  
+logging:
+  file: 
+    path: D:/my-projects/ecommerce_microservice/logs/

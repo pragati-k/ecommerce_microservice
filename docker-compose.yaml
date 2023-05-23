@@ -1,0 +1,121 @@
+version: "3.3"
+
+services:
+  eureka-service:
+    image: com.nagarro/eureka-service:latest
+    container_name: eureka-service
+    build:
+      context: ./eureka_service
+      args:
+        - APP_NAME=eureka-service
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 8761
+    ports:
+      - 8761:8761
+    networks:
+      - emp-network
+  productdetails-service:
+    image: com.nagarro/productdetails-service:latest
+    container_name: productdetails-service
+    build:
+      context: ./productDetails_service
+      args:
+        - APP_NAME=productDetails-service
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 9002
+    ports:
+      - 9002:9002
+    networks:
+      - emp-network
+    depends_on:
+      - eureka-service
+  product-service:
+    image: com.nagarro/product-service:latest
+    container_name: product-service
+    build:
+      context: ./product_service
+      args:
+        - APP_NAME=product_service
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 9001
+    ports:
+      - 9001:9001
+    networks:
+      - emp-network
+    depends_on:
+      - eureka-service
+      - productdetails-service
+  cart-service:
+    image: com.nagarro/cart-service:latest
+    container_name: cart-service
+    build:
+      context: ./cart_service
+      args:
+        - APP_NAME=cart_service
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 9005
+    ports:
+      - 9005:9005
+    networks:
+      - emp-network
+    depends_on:
+      - eureka-service
+      - productdetails-service
+      - product-service
+  admin-service:
+    image: com.nagarro/admin-service:latest
+    container_name: admin-service
+    build:
+      context: ./admin_service
+      args:
+        - APP_NAME=admin_service
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 9000
+    ports:
+      - 9000:9000
+    networks:
+      - emp-network
+    depends_on:
+      - eureka-service
+      - product-service
+      - productdetails-service
+  apigatway-service:
+    image: com.nagarro/apigateway-service:latest
+    container_name: apigateway-service
+    build:
+      context: ./api_gateway
+      args:
+        - APP_NAME=api_gateway
+        - APP_VERSION=0.0.1
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    expose:
+      - 8999
+    ports:
+      - 8999:8999
+    networks:
+      - emp-network
+    depends_on:
+      - eureka-service
+      - product-service
+      - productdetails-service
+      - cart-service
+      - admin-service
+networks:
+    emp-network:
+        driver: bridge

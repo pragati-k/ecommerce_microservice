@@ -1,0 +1,76 @@
+server:
+ port: 8999
+
+eureka:
+ instance:
+  hostname: localhost
+  
+logging:
+  file: 
+    path: D:/my-projects/ecommerce_microservice/logs/  
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    web:
+      exposure:
+        include: hystrix.stream
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+
+spring:
+ application:
+  name: api-gateway
+ main:
+  webApplicationType: reactive
+ cloud:
+  gateway:
+   routes:
+    - id: product-service
+      uri: lb://product-service
+      predicates:
+        - Path=/product/**   
+      filters:
+        - name: CircuitBreaker
+          args:
+            name: product-service
+            fallbackuri: forward:/productServiceFallBack
+    - id: product-details-service
+      uri: lb://product-details-service
+      predicates:
+        - Path=/details/**
+      filters:
+        - name: CircuitBreaker
+          args:
+            name: product-details-service
+            fallbackuri: forward:/productDetailsServiceFallBack
+    - id: cart-service
+      uri: lb://cart-service
+      predicates:
+        - Path=/cart/**
+      filters:
+        - name: CircuitBreaker
+          args:
+            name: cart-service
+            fallbackuri: forward:/cartServiceFallBack
+    - id: admin-service
+      uri: lb://admin-service
+      predicates:
+        - Path=/admin/**
+      filters:
+        - name: CircuitBreaker
+          args:
+            name: admin-service
+            fallbackuri: forward:/adminServiceFallBack
+        
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+            
